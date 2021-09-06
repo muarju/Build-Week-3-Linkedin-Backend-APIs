@@ -1,6 +1,7 @@
 import express from "express"
 import listEndpoints from "express-list-endpoints"
 import mongoose from 'mongoose'
+import profileRouter from './services/profile/routes.js'
 import {badRequestErrorHandler, catchAllErrorHandler, notFoundErrorHandler} from './errorHandlers.js'
 import cors from "cors";
 
@@ -15,6 +16,7 @@ server.use(express.json())
 
 // ******************* ROUTES ***********************
 
+server.use("/profile", profileRouter)
 
 
 // ******************* ERROR HANDLERS ******************
