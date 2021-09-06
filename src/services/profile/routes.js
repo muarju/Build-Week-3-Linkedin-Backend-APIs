@@ -87,4 +87,22 @@ profileRouter.get("/:profileId/CV",async(req,res,next)=>{
   }
 })
 
+profileRouter.post("/login", async(req,res,next) => {
+  try {
+    const {email,password}=req.body;
+    const data = await ProfileSchema.findOne(
+      { "email": email.toLowerCase() },
+    );
+     // check account found and verify password
+    if (!data || !bcrypt.compareSync(password, data.password)) {
+      res.status(400).send("authentication failed");
+    } else {
+      // authentication successful
+      res.send(data);
+    }
+  } catch (error) {
+    next(error)
+  }
+})
+
 export default profileRouter
