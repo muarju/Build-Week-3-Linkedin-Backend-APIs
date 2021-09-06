@@ -3,6 +3,7 @@ import ProfileSchema from "./Schema.js"
 import createError from "http-errors";
 import multer from "multer";
 import saveImageCloudinary from "../../tools/saveImageCloudinary.js";
+import { generateProfileCVPDF } from "../../tools/pdf/index.js";
 import bcrypt from 'bcryptjs'
 import {
     checkProfileSchema,
@@ -97,7 +98,17 @@ async(req,res,next)=>{
 })
 profileRouter.get("/:profileId/CV",async(req,res,next)=>{
   try {
-    
+    const profileId=req.params.profileId
+    const profile=await ProfileSchema.findById(profileId)
+    if(profile){
+      const pdfStream = await generateProfileCVPDF(profile);
+    res.setHeader("Content-Type", "application/pdf");
+    pdfStream.pipe(res);
+    pdfStream.end();
+    }
+    else{
+        next(createError(404, `Profile with id ${req.params.profileId} not found!`));
+    }
   } catch (error) {
     next(error)
   }

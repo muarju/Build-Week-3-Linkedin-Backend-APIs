@@ -18,6 +18,7 @@ const profileSchema = {
     isString: {
       errorMessage: "email validation failed , type must be string ",
     },
+    
   },
   password: {
     in: ["body"],
