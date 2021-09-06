@@ -18,6 +18,7 @@ server.use(express.json())
 
 // ******************* ROUTES ***********************
 server.use('/post',postRoutes)
+server.use('/comment',commentRoutes)
 server.use('/experience', expRouter)
 server.use('/profile', profileRouter)
 
