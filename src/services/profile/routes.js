@@ -1,6 +1,8 @@
 import express from "express";
 import ProfileSchema from "./Schema.js"
 import createError from "http-errors";
+import multer from "multer";
+import saveImageCloudinary from "../../tools/saveImageCloudinary.js";
 import bcrypt from 'bcryptjs'
 import {
     checkProfileSchema,
@@ -72,9 +74,23 @@ profileRouter.delete("/:profileId",async(req,res,next)=>{
     next(error)
   }
 })
-profileRouter.post("/:profileId/picture",async(req,res,next)=>{
+profileRouter.put("/:profileId/picture",
+multer({ storage: saveImageCloudinary }).single("profileImage"),
+async(req,res,next)=>{
   try {
-    
+    const image = req.file.path;
+      const profileId = req.params.profileId;
+
+      const updatedProfile = await ProfileSchema.findByIdAndUpdate(
+        profileId,
+        { image },
+        { new: true }
+      );
+      if (updatedProfile) {
+        res.send(updatedProfile);
+      } else {
+        next(createHttpError(404, `Profile with id: ${profileId} not found!`));
+      }
   } catch (error) {
     next(error)
   }
