@@ -1,6 +1,6 @@
 import express from "express"
 import createError from "http-errors"
-import comments from "./Schema.js"
+import comments from "./schema.js"
 
 const commentsRouter = express.Router()
 
