@@ -1,10 +1,9 @@
 import express from "express"
 import listEndpoints from "express-list-endpoints"
 import mongoose from 'mongoose'
-import profileRouter from './services/profile/routes.js'
+import postRoutes from './services/posts/routes.js'
 import {badRequestErrorHandler, catchAllErrorHandler, notFoundErrorHandler} from './errorHandlers.js'
 import cors from "cors";
-import expRouter from "./services/experience/Routes.js";
 
 const server = express()
 
@@ -16,9 +15,7 @@ server.use(cors());
 server.use(express.json())
 
 // ******************* ROUTES ***********************
-
-server.use('/experiences', expRouter)
-server.use("/profile", profileRouter)
+server.use('/post',postRoutes)
 
 
 // ******************* ERROR HANDLERS ******************

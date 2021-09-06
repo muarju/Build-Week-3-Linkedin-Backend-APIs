@@ -6,8 +6,7 @@ const PostsRouter = express.Router()
 
 PostsRouter.get("/", async(req,res,next) => {
     try {
-        const allPost = await Posts.find({})
-        res.send(allPost)
+      
     } catch (error) {
       next(error)
     }
