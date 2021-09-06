@@ -20,4 +20,4 @@ const postSchema = new Schema(
   }
 )
 
-export default model("posts", postSchema)
+export default model("posts", postSchema) 

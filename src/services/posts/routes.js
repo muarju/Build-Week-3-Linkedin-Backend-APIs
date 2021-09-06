@@ -191,6 +191,29 @@ PostsRouter.put(
       next(error)
     }
   }
+
 )
 
-export default PostsRouter
+PostsRouter.get("/:postId/like/:userId", async(req,res,next) => {
+  try {
+    const {postId, userId} = req.params
+    const isLiked = await Posts.find( { likes: userId } )
+    let response
+    if (isLiked.length === 0 ){
+       response = await Posts.findByIdAndUpdate(postId, {$push : {
+        likes: userId
+      }}, {new: true})
+      
+    } else {
+      response = await Posts.findByIdAndUpdate(postId, {$pull : {
+        likes: userId
+      }}, {new: true})
+    }
+    res.send({totalLikes: response.likes.length, currentUserLike: response.likes.includes(userId)? true: false})
+  } catch (error) {
+    res.status(500)
+    next(error)
+  }
+})
+
+export default PostsRouter;
