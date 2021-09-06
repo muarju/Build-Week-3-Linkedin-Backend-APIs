@@ -2,7 +2,7 @@ import { Router } from 'express'
 import createError from 'http-errors'
 import ExpModel from './schema.js'
 import multer from 'multer'
-import { mediaStorage } from './media.js'
+import { mediaStorage } from '../../tools/saveImageCloudinary.js'
 
 
 const expRouter = Router()
