@@ -1,6 +1,8 @@
 import express from 'express'
 import createError from 'http-errors'
 import Posts from './schema.js'
+import multer from 'multer'
+import { mediaStorage } from '../../tools/saveImageCloudinary.js'
 
 const PostsRouter = express.Router()
 
@@ -38,16 +40,46 @@ PostsRouter.post("/", async(req,res,next) => {
 })
 PostsRouter.put("/:_id", async(req,res,next) => {
     try {
-      
+      const modifiedPost=await Posts.findByIdAndUpdate(req.params._id,
+        req.body,{new:true})
+      if (modifiedPost) {
+          res.send(modifiedPost);
+        } else {
+          next(createError(404, `Post with id ${req.params._id} not found`));
+        }
     } catch (error) {
       next(error)
     }
 })
 PostsRouter.delete("/:_id", async(req,res,next) => {
     try {
-      
+      const { _id } = req.params
+      const deletedPost = await Posts.findByIdAndDelete(req.params._id);
+      if (deletedPost) {
+        res.status(200).send(`Post with id ${_id} deleted successfully`);
+      } else {
+        next(createError(404, `Post with id ${_id} not found!`));
+      }
     } catch (error) {
       next(error)
     }
+})
+
+PostsRouter.post("/:id/image", multer({ storage: mediaStorage }).single("image"), async (req, res, next) => {
+  try {
+      const { id } = req.params
+      const data = await Posts.findById(id)
+      if (data) {
+          const modifiedPost = await Posts.findByIdAndUpdate(id, { image: req.file.path }, {
+              new: true
+          })
+          res.send(modifiedPost)
+      } else {
+          next(createError(404, `Experience with id: ${id} not found!`))
+      }
+  } catch (error) {
+      console.log(error);
+      next(error)
+  }
 })
 export default PostsRouter;
