@@ -65,7 +65,7 @@ PostsRouter.delete("/:_id", async(req,res,next) => {
     }
 })
 
-PostsRouter.post("/:id/image", multer({ storage: mediaStorage }).single("image"), async (req, res, next) => {
+PostsRouter.put("/:id/image", multer({ storage: mediaStorage }).single("image"), async (req, res, next) => {
   try {
       const { id } = req.params
       const data = await Posts.findById(id)
