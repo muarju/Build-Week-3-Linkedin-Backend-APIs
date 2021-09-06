@@ -3,6 +3,7 @@ import listEndpoints from "express-list-endpoints"
 import mongoose from 'mongoose'
 import {badRequestErrorHandler, catchAllErrorHandler, notFoundErrorHandler} from './errorHandlers.js'
 import cors from "cors";
+import expRouter from "./services/experience/Routes.js";
 
 const server = express()
 
@@ -15,7 +16,7 @@ server.use(express.json())
 
 // ******************* ROUTES ***********************
 
-
+server.use('/experiences', expRouter)
 
 // ******************* ERROR HANDLERS ******************
 
