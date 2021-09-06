@@ -4,7 +4,7 @@ import mongoose from "mongoose"
 import postRoutes from "./services/posts/routes.js"
 import expRouter from "./services/experience/Routes.js"
 import profileRouter from "./services/profile/routes.js"
-import commentsRouter from "./services/comments/routes.js"
+// import commentsRouter from "./services/comments/routes.js"
 import {
   badRequestErrorHandler,
   catchAllErrorHandler,
@@ -23,7 +23,7 @@ server.use(express.json())
 
 // ******************* ROUTES ***********************
 server.use("/post", postRoutes)
-server.use("/comment", commentsRouter)
+// server.use("/comment", commentsRouter)
 server.use("/experience", expRouter)
 server.use("/profile", profileRouter)
 

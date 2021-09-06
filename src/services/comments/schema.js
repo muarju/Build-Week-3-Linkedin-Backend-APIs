@@ -12,7 +12,7 @@ const CommentSchema = new Schema(
     },
     postId: {
       type: Schema.Types.ObjectId,
-      ref: "blogPost",
+      ref: "posts",
       required: true,
     },
   },
