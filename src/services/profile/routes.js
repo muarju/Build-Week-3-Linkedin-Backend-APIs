@@ -1,6 +1,7 @@
 import express from "express";
 import ProfileSchema from "./Schema.js"
 import createError from "http-errors";
+import bcrypt from 'bcryptjs'
 import {
     checkProfileSchema,
     checkValidationResult,
@@ -19,7 +20,9 @@ profileRouter.get("/",async(req,res,next)=>{
 profileRouter.post("/",checkProfileSchema,
 checkValidationResult,async(req,res,next)=>{
   try {
-    const newProfile=new ProfileSchema(req.body)
+    const {email, password} = req.body;
+    const passwordHash = bcrypt.hashSync(password, 10);
+    const newProfile=new ProfileSchema({...req.body, email:email.toLowerCase(),password:passwordHash})
     const profile=await newProfile.save()
     res.status(201).send(profile)
     
@@ -44,7 +47,7 @@ profileRouter.get("/:profileId",async(req,res,next)=>{
 })
 profileRouter.put("/:profileId",async(req,res,next)=>{
   try {
-    const modifiedProfile=await ProfileRouter.findByIdAndUpdate(req.params.profileId,
+    const modifiedProfile=await ProfileSchema.findByIdAndUpdate(req.params.profileId,
         req.body,{new:true})
         if (modifiedProfile) {
             res.send(modifiedProfile);
@@ -57,7 +60,7 @@ profileRouter.put("/:profileId",async(req,res,next)=>{
 })
 profileRouter.delete("/:profileId",async(req,res,next)=>{
   try {
-    const deletedProfile = await ProfileModel.findByIdAndDelete(req.params.profileId);
+    const deletedProfile = await ProfileSchema.findByIdAndDelete(req.params.profileId);
     if (deletedProfile) {
       res
         .status(204)
