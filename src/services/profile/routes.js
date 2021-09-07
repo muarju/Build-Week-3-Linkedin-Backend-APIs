@@ -9,6 +9,7 @@ import authJwt from '../../tools/authJwt.js'
 import jwt from 'jsonwebtoken'
 import { Readable, pipeline } from 'stream'
 import { Transform } from 'json2csv'
+import { generateProfileCVPDF } from "../../tools/pdf/index.js";
 import bcrypt from 'bcryptjs'
 
 import {
@@ -86,22 +87,46 @@ profileRouter.delete("/:profileId",[authJwt.verifyToken], async (req, res, next)
     next(error)
   }
 })
-
-profileRouter.post("/:profileId/picture",[authJwt.verifyToken], async (req, res, next) => {
+profileRouter.put("/:profileId/picture",[authJwt.verifyToken],
+multer({ storage: mediaStorage }).single("profileImage"),
+async(req,res,next)=>{
   try {
+    const image = req.file.path;
+      const profileId = req.params.profileId;
 
+      const updatedProfile = await ProfileSchema.findByIdAndUpdate(
+        profileId,
+        { image },
+        { new: true }
+      );
+      if (updatedProfile) {
+        res.send(updatedProfile);
+      } else {
+        next(createHttpError(404, `Profile with id: ${profileId} not found!`));
+      }
+  } catch (error) {
+    console.log(error);
+    next(error)
+  }
+})
+
+profileRouter.get("/:profileId/CV",[authJwt.verifyToken], async(req,res,next)=>{
+  try {
+    const profileId=req.params.profileId
+    const profile=await ProfileSchema.findById(profileId)
+    if(profile){
+      const pdfStream = await generateProfileCVPDF(profile);
+    res.setHeader("Content-Type", "application/pdf");
+    pdfStream.pipe(res);
+    pdfStream.end();
+    }
+    else{
+        next(createError(404, `Profile with id ${req.params.profileId} not found!`));
+    }
   } catch (error) {
     next(error)
   }
 })
-profileRouter.get("/:profileId/CV", async (req, res, next) => {
-  try {
-
-  } catch (error) {
-    next(error)
-  }
-})
-
 
 // E X P E R I E N C E S     H E R E
 
@@ -193,11 +218,12 @@ profileRouter.put("/:username/experiences/:id/image",[authJwt.verifyToken], mult
     } else {
       next(createError(404, `Experience with id: ${id} not found!`))
     }
-  } catch (error) {
+  }catch(error){
     console.log(error);
     next(error)
   }
 })
+
 
 profileRouter.get('/:username/csv',[authJwt.verifyToken], async (req, res, next) => {
   try {
