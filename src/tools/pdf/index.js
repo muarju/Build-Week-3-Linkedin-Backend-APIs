@@ -1,6 +1,7 @@
 import PdfPrinter from "pdfmake";
-import striptags from "striptags";
 import axios from "axios";
+import { pipeline } from "stream"
+import { promisify } from "util"
 
 const fonts = {
     Roboto: {
@@ -12,31 +13,52 @@ const fonts = {
   };
 
   const printer = new PdfPrinter(fonts); 
-  export const generateProfileCVPDF = async (profile) => {
-    /* let imagePart = {};
+  export const generateProfileCVPDF = async (profile,experience) => {
+      console.log(experience)
+    const asyncPipeline = promisify(pipeline)
+    let image = {};
     if (profile.image) {
         const response = await axios.get(profile.image, {
           responseType: "arraybuffer",
         });
-        const profileCoverURLParts = profile.cover.split("/");
+        const profileCoverURLParts = profile.image.split("/");
         const fileName = profileCoverURLParts[profileCoverURLParts.length - 1];
         const [id, extension] = fileName.split(".");
         const base64 = response.data.toString("base64");
         const base64Image = `data:image/${extension};base64,${base64}`;
-        imagePart = { image: base64Image, width: 500, margin: [0, 0, 0, 40] };
-    } */
+        image = { image: base64Image, width: 100, margin: [0, 0, 0, 20] };
+    }
       const docDefinition={
           content:[
-                {  text:"Name: "+profile.name,fontSize:20,lineHeight:1.5 /* margin:[0,0,0,20] */},
-                {  text:"Surname: "+profile.surname,fontSize:20,lineHeight:1.5/* bold:true, margin:[0,0,0,20] */},
-                {  text:"Email: "+profile.email,fontSize:20,lineHeight:1.5 /* margin:[0,0,0,20] */},
-                {  text:"Bio: "+profile.bio,fontSize:20,lineHeight:1.5 /* margin:[0,0,0,20] */},
-                {  text:"Title: "+profile.title,fontSize:20,lineHeight:1.5 /* margin:[0,0,0,20] */},
-                {  text:"Area: "+profile.area,fontSize:20,lineHeight:1.5 /* margin:[0,0,0,20] */},
-                
+            {columns: [
+                { margin: [0, 0, 0, 40], 
+                text:[
+                    {text:"Name: ",fontSize: 20,bold:true},{text:profile.name+'\n\n',fontSize: 20},
+                    {text:"SurName: ",fontSize: 20,bold:true},{text:profile.surname+'\n\n',fontSize: 20},
+                    {text:"Email: ",fontSize: 20,bold:true},{text:profile.email+'\n',fontSize: 20}
+            ]
+        },image
+            ] 
+        },
+            {  margin: [0, 0, 0, 20], text:[
+                {text:"Bio "+'\n\n',fontSize: 20,bold:true},
+                {text:profile.bio,fontSize:15}
+                ] 
+            },
+            { margin: [0, 0, 0, 20], text:[
+                {text:"Title: ",fontSize: 20,bold:true},
+                {text:profile.title,fontSize:15},
+                ] 
+            },
+            {margin: [0, 0, 0, 20],  text:[
+                {text:"Area: ",fontSize: 20,bold:true	},
+                {text:profile.area,fontSize:15}
+                ] 
+            }    
           ],
       }
 
       const pdfDoc = printer.createPdfKitDocument(docDefinition);
+  
       return pdfDoc;
   }
