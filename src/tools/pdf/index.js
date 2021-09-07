@@ -54,7 +54,15 @@ const fonts = {
                 {text:"Area: ",fontSize: 20,bold:true	},
                 {text:profile.area,fontSize:15}
                 ] 
-            }    
+            },
+            {margin: [0, 0, 0, 20],  text:[
+                {text:"Experience: "+'\n\n',fontSize: 20,bold:true	},
+                experience.map(e=>
+                    ({text:"role: ",fontSize: 15,bold:true	},
+                {text:e.role,fontSize:12})
+                )
+                ] 
+            }        
           ],
       }
 

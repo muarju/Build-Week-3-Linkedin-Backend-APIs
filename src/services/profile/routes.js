@@ -115,7 +115,10 @@ profileRouter.get("/:profileId/CV",[authJwt.verifyToken], async(req,res,next)=>{
     const profileId=req.params.profileId
     const profile=await ProfileSchema.findById(profileId)
     if(profile){
-      const pdfStream = await generateProfileCVPDF(profile);
+      const data = await ExpModel.find({ username: profile.username })
+      console.log(profile.username)
+      console.log(data)
+      const pdfStream = await generateProfileCVPDF(profile,data);
     res.setHeader("Content-Type", "application/pdf");
     pdfStream.pipe(res);
     pdfStream.end();
