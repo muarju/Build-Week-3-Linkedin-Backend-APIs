@@ -4,10 +4,12 @@ import Posts from './schema.js'
 import Comment from '../comments/schema.js'
 import multer from 'multer'
 import { mediaStorage } from '../../tools/saveImageCloudinary.js'
+import config from '../../tools/auth.config.js'
+import authJwt from '../../tools/authJwt.js'
 
 const PostsRouter = express.Router()
 
-PostsRouter.get("/", async(req,res,next) => {
+PostsRouter.get("/",[authJwt.verifyToken], async(req,res,next) => {
     try {
       const posts=await Posts.find({}).populate('user').populate('Comments')
       res.send(posts)
@@ -15,7 +17,7 @@ PostsRouter.get("/", async(req,res,next) => {
       next(error)
     }
 })
-PostsRouter.get("/:_id", async(req,res,next) => {
+PostsRouter.get("/:_id",[authJwt.verifyToken], async(req,res,next) => {
     try {
       const postId=req.params._id
       const post=await Posts.findById(postId).populate('user').populate('Comments')
@@ -30,7 +32,7 @@ PostsRouter.get("/:_id", async(req,res,next) => {
     }
 })
 
-PostsRouter.post("/", async(req,res,next) => {
+PostsRouter.post("/",[authJwt.verifyToken], async(req,res,next) => {
     try {
       const newPost=new Posts(req.body)
       const post=await newPost.save()
@@ -39,7 +41,7 @@ PostsRouter.post("/", async(req,res,next) => {
       next(error)
     }
 })
-PostsRouter.put("/:_id", async(req,res,next) => {
+PostsRouter.put("/:_id",[authJwt.verifyToken], async(req,res,next) => {
     try {
       const modifiedPost=await Posts.findByIdAndUpdate(req.params._id,
         req.body,{new:true})
@@ -52,7 +54,7 @@ PostsRouter.put("/:_id", async(req,res,next) => {
       next(error)
     }
 })
-PostsRouter.delete("/:_id", async(req,res,next) => {
+PostsRouter.delete("/:_id",[authJwt.verifyToken], async(req,res,next) => {
     try {
       const { _id } = req.params
       const deletedPost = await Posts.findByIdAndDelete(req.params._id);
@@ -66,7 +68,7 @@ PostsRouter.delete("/:_id", async(req,res,next) => {
     }
 })
 
-PostsRouter.put("/:id/image", multer({ storage: mediaStorage }).single("image"), async (req, res, next) => {
+PostsRouter.put("/:id/image",[authJwt.verifyToken], multer({ storage: mediaStorage }).single("image"), async (req, res, next) => {
   try {
       const { id } = req.params
       const data = await Posts.findById(id)
@@ -84,7 +86,7 @@ PostsRouter.put("/:id/image", multer({ storage: mediaStorage }).single("image"),
   }
 })
 
-PostsRouter.get("/:postId/like/:userId", async(req,res,next) => {
+PostsRouter.get("/:postId/like/:userId",[authJwt.verifyToken], async(req,res,next) => {
   try {
     const {postId, userId} = req.params
     const isLiked = await Posts.find( { likes: userId } )
@@ -106,7 +108,7 @@ PostsRouter.get("/:postId/like/:userId", async(req,res,next) => {
   }
 })
 
-PostsRouter.get("/:postId/comment", async (req, res, next) => {
+PostsRouter.get("/:postId/comment",[authJwt.verifyToken], async (req, res, next) => {
   try {
     const post = await Posts.findById(req.params.postId).populate('Comments')
     res.send(post.Comments)
@@ -114,7 +116,7 @@ PostsRouter.get("/:postId/comment", async (req, res, next) => {
     next(error)
   }
 })
-PostsRouter.get("/:postId/comment/:_id", async (req, res, next) => {
+PostsRouter.get("/:postId/comment/:_id",[authJwt.verifyToken], async (req, res, next) => {
   try {
     const commentId = req.params._id
     const comment = await Comment.findById(commentId)
@@ -133,7 +135,7 @@ PostsRouter.get("/:postId/comment/:_id", async (req, res, next) => {
   }
 })
 
-PostsRouter.post("/:postId/comment", async (req, res, next) => {
+PostsRouter.post("/:postId/comment",[authJwt.verifyToken], async (req, res, next) => {
   try {
     const newComment = await Comment.create(req.body);
     if (newComment) {
@@ -153,7 +155,7 @@ PostsRouter.post("/:postId/comment", async (req, res, next) => {
 
 
 
-PostsRouter.put("/:postId/comment/:_id", async (req, res, next) => {
+PostsRouter.put("/:postId/comment/:_id",[authJwt.verifyToken], async (req, res, next) => {
   try {
     const modifiedComment = await Comment.findByIdAndUpdate(
       req.params._id,
@@ -174,7 +176,7 @@ PostsRouter.put("/:postId/comment/:_id", async (req, res, next) => {
     next(error)
   }
 })
-PostsRouter.delete("/:postId/comment/:_id", async (req, res, next) => {
+PostsRouter.delete("/:postId/comment/:_id",[authJwt.verifyToken], async (req, res, next) => {
   try {
     const { _id,postId } = req.params
     const deletedComment = await Comment.findByIdAndDelete(_id)
@@ -193,7 +195,7 @@ PostsRouter.delete("/:postId/comment/:_id", async (req, res, next) => {
 })
 
 PostsRouter.put(
-  "/:id/image",
+  "/:id/image",[authJwt.verifyToken],
   multer({ storage: mediaStorage }).single("image"),
   async (req, res, next) => {
     try {
