@@ -2,6 +2,7 @@ import PdfPrinter from "pdfmake";
 import axios from "axios";
 import { pipeline } from "stream"
 import { promisify } from "util"
+import moment from "moment";
 
 const fonts = {
     Roboto: {
@@ -14,7 +15,24 @@ const fonts = {
 
   const printer = new PdfPrinter(fonts); 
   export const generateProfileCVPDF = async (profile,experience) => {
+    const  startDate = moment(experience[0].startDate).format('YYYY-MM-DD')
+    const  endDate = moment(experience[0].endDate).format('YYYY-MM-DD')
+    console.log(startDate)
       console.log(experience)
+      let expArr=experience.map(e=>{
+        [ {text:"role: ",fontSize: 15,bold:true	},
+        {text:experience.role+'\n',fontSize:12},
+        {text:"Company: ",fontSize: 15,bold:true	},
+        {text:experience.company+'\n',fontSize:12},
+        {text:"Start Date: ",fontSize: 15,bold:true	},
+        {text:experience.startDate+'\n',fontSize:12},
+        {text:"End Date: ",fontSize: 15,bold:true	},
+        {text:experience.endDate+'\n',fontSize:12},
+        {text:"Summary: ",fontSize: 15,bold:true	},
+        {text:experience.description+'\n',fontSize:12},
+        ]
+        
+      })
     const asyncPipeline = promisify(pipeline)
     let image = {};
     if (profile.image) {
@@ -50,19 +68,28 @@ const fonts = {
                 {text:profile.title,fontSize:15},
                 ] 
             },
-            {margin: [0, 0, 0, 20],  text:[
+            {margin: [0, 0, 0, 40],  text:[
                 {text:"Area: ",fontSize: 20,bold:true	},
                 {text:profile.area,fontSize:15}
                 ] 
             },
-            {margin: [0, 0, 0, 20],  text:[
-                {text:"Experience: "+'\n\n',fontSize: 20,bold:true	},
-                experience.map(e=>
-                    ({text:"role: ",fontSize: 15,bold:true	},
-                {text:e.role,fontSize:12})
-                )
-                ] 
-            }        
+            {text:"Experience "+'\n\n',fontSize: 20,bold:true,alignment:'center'	},
+            /* experience.map(e=>{ */
+               { text:[ {text:"Role: ",fontSize: 15,bold:true	},
+                {text:experience[0].role+'\n\n',fontSize:15},]},
+                {text:[{text:"Company: ",fontSize: 15,bold:true	},
+                {text:experience[0].company+'\n\n',fontSize:15}]},
+                {text:[{text:"Start Date: ",fontSize: 15,bold:true	},
+                {text:startDate+'\n\n',fontSize:15}]},
+               { text:[{text:"End Date: ",fontSize: 15,bold:true	},
+                {text:endDate+'\n\n',fontSize:15}]},
+               { text:[{text:"Summary: ",fontSize: 15,bold:true	},
+                {text:experience[0].description+'\n',fontSize:15}]},
+                
+                
+             /*  } */
+            
+    
           ],
       }
 
