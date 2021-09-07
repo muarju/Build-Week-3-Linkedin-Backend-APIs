@@ -9,10 +9,11 @@ const expSchema = new Schema({
     endDate: {type: Date},
     description: {type: String, required: true},
     area: {type: String, required: true},
-    username: {type: String, required: true},
+    username: {type: String },
     image: {type: String, required: true},
     
-}, {
+},
+{
     timestamps: true 
 })
 
