@@ -1,12 +1,16 @@
 # Build Week 3 Linkedin Backend APIs
  We are going to create API for Linkedin APP. We are working in a team and we divide the in tasks.
 
+ Heroku link: https://strive-linkedin-api.herokuapp.com
+ (Our API is secure with jwt token, no request accepted without token key)
+
  - We are using Trello board for the task management.
  - GitHub repo for the project and every team member using different branch 
 
 ### This project use the following stack:
 - MongoDB ==> DB
 - ExpressJS ==> API
+- Jwt ==> Generate authentication token
 - ReactJS ==> Frontend
 - NodeJS ==> Server
 - Use Mongoose
@@ -20,12 +24,12 @@ PROFILE Model:
     "name": "Diego",
     "surname": "Banovaz",
     "email": "diego@strive.school",
-    "password": "Strive123",
+    "password": "$2a$10$kQ5ZYBRE5F7vrmeMk9H8LuMD4QZSpChhM4uyxt9TKlvhYZYIXIJoi",
     "bio": "SW ENG",
     "title": "COO @ Strive School",
     "area": "Berlin",
     "image": ..., //server generated on upload, set a default here
-    "username": "admin",
+    "username": "diego",
     "createdAt": "2019-09-20T08:53:07.094Z", //server generated
     "updatedAt": "2019-09-20T09:00:46.977Z", //server generated
 }
@@ -41,7 +45,7 @@ EXPERIENCE Model:
         "endDate": "2019-06-16T22:00:00.000Z", //could be null
         "description": "Doing stuff here and there",
         "area": "Berlin",
-        "username": "admin",
+        "username": "diego",
         "createdAt": "2019-09-30T19:58:31.019Z",  //server generated
         "updatedAt": "2019-09-30T19:58:31.019Z",  //server generated
         "image": ... //server generated on upload, set a default here
@@ -53,7 +57,7 @@ POST Model:
  {
     "_id": "5d93ac84b86e220017e76ae1", //server generated
     "text": "this is a text 12312 1 3 1",  <<--- THIS IS THE ONLY ONE YOU'LL BE SENDING!!!
-    "username": "admin",
+    "username": "diego",
     "user": {
         "_id": "5d84937322b7b54d848eb41b", //server generated
         "name": "Diego",
@@ -63,7 +67,7 @@ POST Model:
         "title": "COO @ Strive School",
         "area": "Berlin",
         "image": ..., //server generated on upload, set a default here
-        "username": "admin",
+        "username": "diego",
         "createdAt": "2019-09-20T08:53:07.094Z", //server generated
         "updatedAt": "2019-09-20T09:00:46.977Z", //server generated
     }
@@ -75,91 +79,90 @@ POST Model:
 
 ##  # API #
 ### PROFILES:
-- GET https://yourapi.herokuapp.com/api/profile/
+- GET https://strive-linkedin-api.herokuapp.com/profile/
 Retrieves list of profiles
 
-- GET https://yourapi.herokuapp.com/api/profile/{userId}
+- GET https://strive-linkedin-api.herokuapp.com/profile/{userId}
 Retrieves the profile with userId = {userId}
 
-- POST https://yourapi.herokuapp.com/api/profile/
+- POST https://strive-linkedin-api.herokuapp.com/profile/
 Create the user profile with all his details
 
-- PUT https://yourapi.herokuapp.com/api/profile/
+- PUT https://strive-linkedin-api.herokuapp.com/profile/
 Update current user profile details
 
-- POST https://yourapi.herokuapp.com/api/profile/{userId}/picture
+- POST https://strive-linkedin-api.herokuapp.com/profile/{userId}/picture
 Replace user profile picture (name = profile)
 
-- GET https://yourapi.herokuapp.com/api/profile/{userId}/CV
+- GET https://strive-linkedin-api.herokuapp.com/profile/{userId}/CV
 Generates and download a PDF with the CV of the user (details, picture, experiences)
 
 ###  EXPERIENCE:
-- GET https://yourapi.herokuapp.com/api/profile/userName/experiences
+- GET https://strive-linkedin-api.herokuapp.com/profile/userName/experiences
 Get user experiences
 
-- POST https://yourapi.herokuapp.com/api/profile/userName/experiences
+- POST https://strive-linkedin-api.herokuapp.com/profile/userName/experiences
 Create an experience.
 
-- GET https://yourapi.herokuapp.com/api/profile/userName/experiences/:expId
+- GET https://strive-linkedin-api.herokuapp.com/profile/userName/experiences/:expId
 Get a specific experience
 
-- PUT https://yourapi.herokuapp.com/api/profile/userName/experiences/:expId
+- PUT https://strive-linkedin-api.herokuapp.com/profile/userName/experiences/:expId
 Get a specific experience
 
-- DELETE https://yourapi.herokuapp.com/api/profile/userName/experiences/:expId
+- DELETE https://strive-linkedin-api.herokuapp.com/profile/userName/experiences/:expId
 Get a specific experience
 
-- POST https://yourapi.herokuapp.com/api/profile/userName/experiences/:expId/picture
+- POST https://strive-linkedin-api.herokuapp.com/profile/userName/experiences/:expId/picture
 Change the experience picture
 
-- GET https://yourapi.herokuapp.com/api/profile/userName/experiences/CSV
+- GET https://strive-linkedin-api.herokuapp.com/profile/userName/experiences/CSV
 Download the experiences as a CSV
 
+- GET https://strive-linkedin-api.herokuapp.com/profile/login
+verify login details with database and return user details with token key
+
 ### POSTS:
- - GET https://yourapi.herokuapp.com/api/posts/
+ - GET https://strive-linkedin-api.herokuapp.com/posts/
 Retrieve posts
 
-- POST https://yourapi.herokuapp.com/api/posts/
+- POST https://strive-linkedin-api.herokuapp.com/posts/
 Creates a new post
 
-- GET https://yourapi.herokuapp.com/api/posts/{postId}
+- GET https://strive-linkedin-api.herokuapp.com/posts/{postId}
 Retrieves the specified post
 
-- PUT https://yourapi.herokuapp.com/api/posts/{postId}
+- PUT https://strive-linkedin-api.herokuapp.com/posts/{postId}
 Edit a given post
 
-- DELETE https://yourapi.herokuapp.com/api/posts/{postId}
+- DELETE https://strive-linkedin-api.herokuapp.com/posts/{postId}
 Removes a post
 
-- POST https://yourapi.herokuapp.com/api/posts/{postId}/image
+- POST https://strive-linkedin-api.herokuapp.com/posts/{postId}/image
 Add an image to the post under the name of "post"
 
-- POST https://striveschool-api.herokuapp.com/api/posts/{id}/like
-
+- POST https://striveschool-api.herokuapp.com/posts/{id}/like
 Like the post for current user (each user can like only once per post)
 
-- DELETE https://striveschool-api.herokuapp.com/api/posts/{id}/like
-
+- DELETE https://striveschool-api.herokuapp.com/posts/{id}/like
 Remove the like for current user
 
-- GET https://striveschool-api.herokuapp.com/api/posts/{id}/comment
-
+- GET https://striveschool-api.herokuapp.com/posts/{id}/comment
 Retrieve the list of comments for a given post
 
-- POST https://striveschool-api.herokuapp.com/api/posts/{id}/comment
-
+- POST https://striveschool-api.herokuapp.com/posts/{id}/comment
 Create the a new comment for a given post
 
-- DELETE https://striveschool-api.herokuapp.com/api/posts/{id}/comment/{commentId}
-
+- DELETE https://striveschool-api.herokuapp.com/posts/{id}/comment/{commentId}
 Deletes a given comment
 
-- PUT https://striveschool-api.herokuapp.com/api/posts/{id}/comment/{commentId}
-
+- PUT https://striveschool-api.herokuapp.com/posts/{id}/comment/{commentId}
 Edit a given comment
 
 
-#EXTRA: Find a way to return also the user with the posts, in order to have the Name / Picture to show it correcly on the frontend
+#EXTRA: 
+- Find a way to return also the user with the posts, in order to have the Name / Picture to show it correctly on the frontend
+- 
 
 ## # FRONTEND #
 Frontend repo link: https://github.com/muarju/build-week-3-linkedin-frontend
