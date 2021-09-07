@@ -4,6 +4,9 @@ import createError from "http-errors";
 import multer from 'multer'
 import ExpModel from '../experience/schema.js'
 import { mediaStorage } from "../../tools/saveImageCloudinary.js";
+import config from '../../tools/auth.config.js'
+import authJwt from '../../tools/authJwt.js'
+import jwt from 'jsonwebtoken'
 import { Readable, pipeline } from 'stream'
 import { Transform } from 'json2csv'
 import bcrypt from 'bcryptjs'
@@ -17,7 +20,7 @@ import {
 
 const profileRouter = express.Router();
 
-profileRouter.get("/", async (req, res, next) => {
+profileRouter.get("/", [authJwt.verifyToken], async (req, res, next) => {
   try {
     const profile = await ProfileSchema.find({})
     res.send(profile)
@@ -26,7 +29,7 @@ profileRouter.get("/", async (req, res, next) => {
   }
 })
 
-profileRouter.post("/",checkProfileSchema,
+profileRouter.post("/",[authJwt.verifyToken], checkProfileSchema,
 checkValidationResult,async(req,res,next)=>{
   try {
     const {email, password} = req.body;
@@ -40,7 +43,7 @@ checkValidationResult,async(req,res,next)=>{
   }
 })
 
-profileRouter.get("/:profileId", async (req, res, next) => {
+profileRouter.get("/:profileId",[authJwt.verifyToken], async (req, res, next) => {
   try {
     const profileId = req.params.profileId
     const profile = await ProfileSchema.findById(profileId)
@@ -55,7 +58,7 @@ profileRouter.get("/:profileId", async (req, res, next) => {
   }
 })
 
-profileRouter.put("/:profileId", async (req, res, next) => {
+profileRouter.put("/:profileId",[authJwt.verifyToken], async (req, res, next) => {
   try {
     const modifiedProfile=await ProfileSchema.findByIdAndUpdate(req.params.profileId,
         req.body,{new:true})
@@ -69,7 +72,7 @@ profileRouter.put("/:profileId", async (req, res, next) => {
   }
 })
 
-profileRouter.delete("/:profileId", async (req, res, next) => {
+profileRouter.delete("/:profileId",[authJwt.verifyToken], async (req, res, next) => {
   try {
     const deletedProfile = await ProfileSchema.findByIdAndDelete(req.params.profileId);
     if (deletedProfile) {
@@ -84,7 +87,7 @@ profileRouter.delete("/:profileId", async (req, res, next) => {
   }
 })
 
-profileRouter.post("/:profileId/picture", async (req, res, next) => {
+profileRouter.post("/:profileId/picture",[authJwt.verifyToken], async (req, res, next) => {
   try {
 
   } catch (error) {
@@ -102,7 +105,7 @@ profileRouter.get("/:profileId/CV", async (req, res, next) => {
 
 // E X P E R I E N C E S     H E R E
 
-profileRouter.get('/:username/experiences', async (req, res, next) => {
+profileRouter.get('/:username/experiences',[authJwt.verifyToken], async (req, res, next) => {
 
   try {
     const data = await ExpModel.find({ username: req.params.username })
@@ -114,7 +117,7 @@ profileRouter.get('/:username/experiences', async (req, res, next) => {
   }
 })
 
-profileRouter.get('/:username/experiences/:id', async (req, res, next) => {
+profileRouter.get('/:username/experiences/:id',[authJwt.verifyToken], async (req, res, next) => {
 
   try {
     const { id } = req.params
@@ -131,7 +134,7 @@ profileRouter.get('/:username/experiences/:id', async (req, res, next) => {
   }
 })
 
-profileRouter.post('/:username/experiences', async (req, res, next) => {
+profileRouter.post('/:username/experiences',[authJwt.verifyToken], async (req, res, next) => {
   try {
     const data = new ExpModel({ ...req.body, username: req.params.username })
     await data.save()
@@ -142,7 +145,7 @@ profileRouter.post('/:username/experiences', async (req, res, next) => {
   }
 })
 
-profileRouter.put('/:username/experiences/:id', async (req, res, next) => {
+profileRouter.put('/:username/experiences/:id',[authJwt.verifyToken], async (req, res, next) => {
   try {
     const { id } = req.params
     const data = await ExpModel.findByIdAndUpdate(id, { ...req.body, username: req.params.username }, {
@@ -161,7 +164,7 @@ profileRouter.put('/:username/experiences/:id', async (req, res, next) => {
   }
 })
 
-profileRouter.delete('/:username/experiences/:id', async (req, res, next) => {
+profileRouter.delete('/:username/experiences/:id',[authJwt.verifyToken], async (req, res, next) => {
   try {
     const { id } = req.params
     const data = await ExpModel.findByIdAndDelete(id)
@@ -178,7 +181,7 @@ profileRouter.delete('/:username/experiences/:id', async (req, res, next) => {
   }
 })
 
-profileRouter.put("/:username/experiences/:id/image", multer({ storage: mediaStorage }).single("image"), async (req, res, next) => {
+profileRouter.put("/:username/experiences/:id/image",[authJwt.verifyToken], multer({ storage: mediaStorage }).single("image"), async (req, res, next) => {
   try {
     const { id } = req.params
     const data = await ExpModel.findById(id)
@@ -196,7 +199,7 @@ profileRouter.put("/:username/experiences/:id/image", multer({ storage: mediaSto
   }
 })
 
-profileRouter.get('/:username/csv', async (req, res, next) => {
+profileRouter.get('/:username/csv',[authJwt.verifyToken], async (req, res, next) => {
   try {
     const data = await ExpModel.find({username: req.params.username})
     const source = Readable.from(JSON.stringify(data))
@@ -217,16 +220,22 @@ profileRouter.get('/:username/csv', async (req, res, next) => {
 
 profileRouter.post("/login", async(req,res,next) => {
   try {
+    
     const {email,password}=req.body;
     const data = await ProfileSchema.findOne(
       { "email": email.toLowerCase() },
     );
+    console.log(data)
+    //token generate
+    var token = jwt.sign({ id: data._id }, config.secret, {
+      expiresIn: 864000 // 24 hours
+    });
      // check account found and verify password
     if (!data || !bcrypt.compareSync(password, data.password)) {
       res.status(400).send("authentication failed");
     } else {
       // authentication successful
-      res.send(data);
+      res.send({data,accesstoken: token });
     }
   } catch (error) {
     next(error)
