@@ -1,6 +1,9 @@
 import express from "express"
 import listEndpoints from "express-list-endpoints"
 import mongoose from 'mongoose'
+import bodyParser from "body-parser";
+import postRoutes from './services/posts/routes.js'
+import profileRouter from './services/profile/routes.js'
 import {badRequestErrorHandler, catchAllErrorHandler, notFoundErrorHandler} from './errorHandlers.js'
 import cors from "cors";
 
@@ -12,10 +15,15 @@ const port = process.env.PORT || 3001 || 3000
 server.use(cors());
 
 server.use(express.json())
+// parse requests of content-type - application/json
+server.use(bodyParser.json());
+
+// parse requests of content-type - application/x-www-form-urlencoded
+server.use(bodyParser.urlencoded({ extended: true }));
 
 // ******************* ROUTES ***********************
-
-
+server.use('/post',postRoutes)
+server.use('/profile', profileRouter)
 
 // ******************* ERROR HANDLERS ******************
 
