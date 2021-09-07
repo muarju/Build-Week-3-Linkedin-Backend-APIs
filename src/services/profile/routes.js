@@ -61,8 +61,11 @@ profileRouter.get("/:profileId",[authJwt.verifyToken], async (req, res, next) =>
 
 profileRouter.put("/:profileId",[authJwt.verifyToken], async (req, res, next) => {
   try {
+
+    const {password} = req.body;
+    const passwordHash = bcrypt.hashSync(password, 10);
     const modifiedProfile=await ProfileSchema.findByIdAndUpdate(req.params.profileId,
-        req.body,{new:true})
+        {...req.body,password:passwordHash },{new:true})
         if (modifiedProfile) {
             res.send(modifiedProfile);
           } else {
