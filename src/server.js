@@ -19,7 +19,6 @@ server.use(express.json())
 server.use('/post',postRoutes)
 server.use('/profile', profileRouter)
 
-
 // ******************* ERROR HANDLERS ******************
 
 server.use(badRequestErrorHandler)
