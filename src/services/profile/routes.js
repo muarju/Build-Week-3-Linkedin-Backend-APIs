@@ -87,8 +87,8 @@ profileRouter.delete("/:profileId",[authJwt.verifyToken], async (req, res, next)
     next(error)
   }
 })
-profileRouter.put("/:profileId/picture",
-multer({ storage: saveImageCloudinary }).single("profileImage"),
+profileRouter.put("/:profileId/picture",[authJwt.verifyToken],
+multer({ storage: mediaStorage }).single("profileImage"),
 async(req,res,next)=>{
   try {
     const image = req.file.path;
@@ -106,6 +106,24 @@ async(req,res,next)=>{
       }
   } catch (error) {
     console.log(error);
+    next(error)
+  }
+})
+
+profileRouter.get("/:profileId/CV",[authJwt.verifyToken], async(req,res,next)=>{
+  try {
+    const profileId=req.params.profileId
+    const profile=await ProfileSchema.findById(profileId)
+    if(profile){
+      const pdfStream = await generateProfileCVPDF(profile);
+    res.setHeader("Content-Type", "application/pdf");
+    pdfStream.pipe(res);
+    pdfStream.end();
+    }
+    else{
+        next(createError(404, `Profile with id ${req.params.profileId} not found!`));
+    }
+  } catch (error) {
     next(error)
   }
 })
