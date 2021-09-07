@@ -30,7 +30,7 @@ profileRouter.get("/", [authJwt.verifyToken], async (req, res, next) => {
   }
 })
 
-profileRouter.post("/",[authJwt.verifyToken], checkProfileSchema,
+profileRouter.post("/", checkProfileSchema,
 checkValidationResult,async(req,res,next)=>{
   try {
     const {email, password} = req.body;
