@@ -252,7 +252,7 @@ profileRouter.post("/login", async(req,res,next) => {
     
     const {email,password}=req.body;
     const data = await ProfileSchema.findOne(
-      { "email": email.toLowerCase() },
+      { "email": email},
     );
     console.log(data)
     //token generate
