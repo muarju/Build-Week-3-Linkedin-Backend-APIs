@@ -11,7 +11,9 @@ const PostsRouter = express.Router()
 
 PostsRouter.get("/",[authJwt.verifyToken], async(req,res,next) => {
     try {
-      const posts=await Posts.find({}).populate('user').populate('Comments')
+      const posts=await Posts.find({}).populate('user').populate('Comments').populate({path: 'Comments',
+      populate: [{path: 'profileId', select: 'image'}],
+    })
       res.send(posts)
     } catch (error) {
       next(error)
@@ -20,7 +22,9 @@ PostsRouter.get("/",[authJwt.verifyToken], async(req,res,next) => {
 PostsRouter.get("/:_id",[authJwt.verifyToken], async(req,res,next) => {
     try {
       const postId=req.params._id
-      const post=await Posts.findById(postId).populate('user').populate('Comments')
+      const post=await Posts.findById(postId).populate('user').populate({path: 'Comments',
+      populate: [{path: 'profileId', select: 'image'}],
+    })
       if(post){
         res.send(post)
       }
@@ -119,7 +123,7 @@ PostsRouter.get("/:postId/comment",[authJwt.verifyToken], async (req, res, next)
 PostsRouter.get("/:postId/comment/:_id",[authJwt.verifyToken], async (req, res, next) => {
   try {
     const commentId = req.params._id
-    const comment = await Comment.findById(commentId)
+    const comment = await Comment.findById(commentId).populate('profileId')
     if (comment) {
       res.send(comment)
     } else {
