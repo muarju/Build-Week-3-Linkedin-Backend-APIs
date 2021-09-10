@@ -90,22 +90,21 @@ PostsRouter.put("/:id/image",[authJwt.verifyToken], multer({ storage: mediaStora
   }
 })
 
-PostsRouter.get("/:postId/like/:userId",[authJwt.verifyToken], async(req,res,next) => {
+PostsRouter.get("/:postId/like/:userId", async(req,res,next) => {
   try {
     const {postId, userId} = req.params
-    const isLiked = await Posts.find( { likes: userId } )
     let response
-    if (isLiked.length === 0 ){
-       response = await Posts.findByIdAndUpdate(postId, {$push : {
-        likes: userId
-      }}, {new: true})
-      
-    } else {
+    const post = await Posts.findById(postId)
+    if(post.likes.includes(userId)) {
       response = await Posts.findByIdAndUpdate(postId, {$pull : {
         likes: userId
       }}, {new: true})
+    } else {
+      response = await Posts.findByIdAndUpdate(postId, {$push : {
+        likes: userId
+      }}, {new: true})
     }
-    res.send({totalLikes: response.likes.length, currentUserLike: response.likes.includes(userId)? true: false})
+    res.send({totalLikes: response.likes.length, currentUserLike: response.likes.includes(userId)})
   } catch (error) {
     res.status(500)
     next(error)
