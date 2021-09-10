@@ -113,7 +113,7 @@ async(req,res,next)=>{
   }
 })
 
-profileRouter.get("/:profileId/CV",[authJwt.verifyToken], async(req,res,next)=>{
+profileRouter.get("/:profileId/CV", async(req,res,next)=>{
   try {
     const profileId=req.params.profileId
     const profile=await ProfileSchema.findById(profileId)
