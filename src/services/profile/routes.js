@@ -228,7 +228,7 @@ profileRouter.put("/:username/experiences/:id/image",[authJwt.verifyToken], mult
 })
 
 
-profileRouter.get('/:username/csv',[authJwt.verifyToken], async (req, res, next) => {
+profileRouter.get('/:username/csv', async (req, res, next) => {
   try {
     const data = await ExpModel.find({username: req.params.username})
     const source = Readable.from(JSON.stringify(data))
